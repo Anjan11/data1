@@ -1,0 +1,199 @@
+SED.
+
+substitutions:
+
+1)
+
+ sed 's/day/night/g' filename.
+
+2)
+
+How can you put the string you found in the replacement string if you don't know what it is?
+
+The solution requires the special character "&." It corresponds to the pattern found.
+
+sed 's/[a-z]*/(&)/' <old >new
+You can have any number of "&" in the replacement string. You could also double a pattern, e.g. the first number of a line:
+
+% echo "123 abc" | sed 's/[0-9]*/& &/'
+123 123 abc
+
+Regular expressions are greedy, and try to match as much as possible.
+
+3) 
+
+The "\1" is the first remembered pattern, and the "\2" is the second remembered pattern. Sed has up to nine remembered patterns.
+
+If you wanted to keep the first word of a line, and delete the rest of the line, mark the important part with the parenthesis:
+
+sed 's/\([a-z]*\).*/\1/'
+I should elaborate on this. Regular expressions are greedy, and try to match as much as possible. "[a-z]*" matches zero or more lower case letters, and tries to match as many characters as possible. The ".*" matches zero or more characters after the first match. Since the first one grabs all of the contiguous lower case letters, the second matches anything else. Therefore if you type
+
+echo abcd123 | sed 's/\([a-z]*\).*/\1/'
+This will output "abcd" and delete the numbers.
+
+
+4)
+
+Write to a file with /w filename
+
+sed -n 's/^[0-9]*[02468] /&/w even' <file  
+
+even is the filename /w is writting the output to even file
+
+5)
+
+ /I (case insensitive)
+
+sed -n '/abc/I p' <old >new
+
+-e means expression
+
+-n means no printing
+
+sed -n 's/PATTERN/&/p' file (without -n it will print every thing if we use p)
+
+6)
+
+Ranges by line number
+
+sed '1,100 s/A/a/' filename (it will replace A to a from 1 to 100 lines only)
+
+7)
+
+Ranges by patterns
+
+sed '/start/,/stop/ s/#.*//' filename (it will replace all the # (comments) from start to stop keywords)
+
+8) delete
+ 
+sed '11,$ d' <file (delete from 11 to end of the line)
+
+sed '1,/^$/ d' <file (remove first empty line)
+
+9)
+
+sed -n '1,10 p' <file
+
+10)
+
+Insert a line with 'i'
+
+You can insert a new line before the pattern with the "i" command: 
+
+
+#!/bin/sh
+sed '
+/WORD/ i\
+Add this line before every line with WORD
+
+11)
+
+Change a line with 'c'
+
+You can change the current line with a new line. 
+
+
+#!/bin/sh
+sed '
+/WORD/ c\
+Replace the current line with the line
+'
+
+12)
+
+{} --combining commands
+
+You can combine all three actions using curly braces: 
+
+
+#!/bin/sh
+sed '
+/WORD/ {
+i\
+Add this line before
+a\
+Add this line after
+c\
+Change the line to this one
+}'
+
+13)
+
+Print line number with =
+
+14)
+
+if you want to print the number for a range of lines, you must use the curly braces:
+
+#!/bin/sh
+# Just print the line numbers 
+sed -n '/begin/,/end/ {
+=
+d
+}' file
+
+--------------------------------------------------------------------------
+
+NFS:
+
+[root@web ~]# systemctl start rpcbind
+[root@web ~]# systemctl start nfs
+
+systemctl list-unit-files
+
+https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nfs-mount-on-ubuntu-12-04 (imp)
+
+ubuntu:
+On server:
+
+dpkg -l | grep nfs-kernel-server
+apt-get install nfs-kernel-server
+
+vi /etc/exports
+Imp #Below client Ip is vboxnet0 IP in client side (if i am using vagrant vms)
+/nfsshares 192.168.33.1(rw,sync,no_subtree_check) 
+
+-- rw: This option allows the client server to both read and write within the shared directory
+-- sync: Sync confirms requests to the shared directory only once the changes have been committed.
+-- no_subtree_check: This option prevents the subtree checking. When a shared directory is the subdirectory of a larger filesystem, nfs performs scans of every directory above it, in order to verify its permissions and details. Disabling the subtree check may increase the reliability of NFS, but reduce security.
+-- no_root_squash: This phrase allows root to connect to the designated directory
+
+
+exportfs -ra (need to run this command, if we make any changes in /etc/exportfs file)
+
+service portmap restart
+service nfs-kernel-server restart
+
+For security we can add entries in 
+
+On client
+
+apt-get install nfs-common 
+
+mount -v -t nfs -o nfsvers=3 192.168.33.10:/nfsshares /mnt/nfs/nfsshares
+
+rpcinfo -p 192-168.33.15 (server ip to check which services opened by rpc --communication)
+
+--------------------------------------------------------------------------
+
+NIS:
+
+
+http://www.thegeekstuff.com/2011/11/linux-nis-server-and-client/ (imp)
+
+--------------------------------------------------------------------------
+
+DNS:
+
+http://www.krizna.com/ubuntu/configure-dns-server-ubuntu-14-04/ (imp)
+
+/var/log/syslog (system log for debugging in ubuntu)
+/var/log/messages (system log for debugging in redhat)
+
+------------------------------------------------------------------------
+
+https://www.youtube.com/watch?v=7LCXnBma5z4 [top command imp]
+
+
+

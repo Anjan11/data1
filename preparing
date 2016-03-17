@@ -1,0 +1,425 @@
+install chrome:
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+
+sudo dpkg -i ./google-chrome*.deb
+
+sudo apt-get install -f
+
+----------
+
+installing sqldeveloper:
+
+http://askubuntu.com/questions/458554/how-to-install-sql-developer-on-ubuntu-14-04 [imp search with ppa:webupd8team/java]
+
+sudo add-apt-repository ppa:webupd8team/java  
+sudo apt-get update  
+sudo apt-get install oracle-java8-installer  
+
+Download the SQL Developer from here and choose Other platforms. (You'll need an account in order to download it). Open the Downloads directory:
+
+cd ~/Downloads
+
+and extract the file to /opt:
+
+sudo unzip sqldeveloper-*-no-jre.zip -d /opt/  
+
+Make the launch script executable:
+
+sudo chmod +x /opt/sqldeveloper/sqldeveloper.sh
+
+Open sqldeveloper:
+
+sudo /opt/sqldeveloper/sqldeveloper.sh
+
+The first time you'll be asked to enter the jvm location. In my case (and probably yours if you have followed the first step), the location is: /usr/lib/jvm/java-6-oracle . 
+
+
+for sqldeveloper jre and jdkneed to be installed
+
+anjan@A3623Q1L:~/Downloads$ update-java-alternatives -l (to know jdk installed or not)
+java-1.7.0-openjdk-amd64 1071 /usr/lib/jvm/java-1.7.0-openjdk-amd64
+java-6-oracle 1 /usr/lib/jvm/java-6-oracle
+java-7-oracle 2 /usr/lib/jvm/java-7-oracle
+
+dpkg -l | grep java
+
+display error comes while starting sqldeveloper
+set | grep -i "disp"
+export DISPLAY=:0.0
+xhost +
+
+xhost +localhost
+
+----------
+
+sudoers file
+sudo adduser <username> sudo
+
+----------------------
+
+svn mv https://username@server/svn/old/ https://username@server/svn/new/ [test]
+
+cat /etc/svnpasswd 
+
+anjan
+anjan
+
+svn setup 
+
+http://www.krizna.com/ubuntu/setup-svn-server-on-ubuntu-14-04/ [svn setup ]
+
+sudo apt-get install subversion
+
+run this: sudo a2enmod dav_svn
+
+sudo apt-get install libapache2-svn [to install DAV module for svn]
+
+svn site:
+http://localhost/svn/icingarepo/
+
+below error due to nologin or false in /etc/passwd  file : anjan@A3623Q1L:/svn/repos/icingarepo$ su www-data
+Password: 
+This account is currently not available.
+
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+ 
+sudo chsh -s /bin/bash www-data [to avoid above error run this]
+
+svn commands:
+
+sudo svn import file:///svn/repos/icingarepo -m 'Initial project file'
+
+To create working copy, u need to first checkout (download source from svn server to local directory)
+
+
+svn checkout http://localhost/svn/icingarepo/ /home/anjan/icinga (icinga is the working dir /home/anjan/icinga imp)
+
+In this case i created server repository "/svn/repos/icingarepo/icinga"  (by checking out, two working dir)
+
+local repository /home/anjan/icinga (but i am working from here)
+
+like:
+
+1. anjan@A3623Q1L:~/icinga$ cp -R /usr/lib/nagios/plugins .
+2. cp -R /etc/nagios-plugins/config .
+
+3. svn add * (or to add a specific dir anjan@A3623Q1L:~/icinga$ svn add plugins)
+
+4. svn commit -m "Added plugins
+
+/home/anjan/icinga
+anjan@A3623Q1L:~/icinga$ svn info (we can know working dir by typing svn info or svn status)
+ 
+
+To remove any file from ur local repository do from working dir  like below
+
+svn rm check_* 
+
+svn cleanup
+
+svn update *
+
+svn commit *
+
+svn status
+
+Example:
+------------------
+anjan@A3623Q1L:~/icinga$ svn rm negate process_check.pl urlize utils.sh
+D         negate
+D         process_check.pl
+D         urlize
+D         utils.sh
+
+anjan@A3623Q1L:~/icinga$ svn cleanup
+
+
+anjan@A3623Q1L:~/icinga$ svn cleanup
+
+anjan@A3623Q1L:~/icinga$ svn status
+
+anjan@A3623Q1L:~/icinga$ svn update *
+
+anjan@A3623Q1L:~/icinga$ svn commit -m "message"
+
+Log message unchanged or not specified
+(a)bort, (c)ontinue, (e)dit:
+c
+Deleting       negate
+Deleting       process_check.pl
+Deleting       urlize
+Deleting       utils.sh
+
+Committed revision 8.
+
+If you run below all the 7 version files will come back again (you can say it is reverting the changes done above, this helps if you remove any file unknowingly)
+
+anjan@A3623Q1L:~/icinga$ svn up -r 7
+
+out of date error
+
+svn cleanup
+svn update *
+svn resolved /home/anjan/icinga/check_by_ssh
+svn commit
+
+-----
+svn help status 
+
+The first five columns in the output are each one character wide:
+     First column: Says if item was added, deleted, or otherwise changed
+       ' ' no modifications
+       'A' Added
+       'D' Deleted
+       'M' Modified
+       'C' Conflicted
+       'I' Ignored <--- right there
+       '?' item is not under revision control
+       '!' item is missing (removed by non-svn command) or incomplete
+       '~' versioned item obstructed by some item of a different kind 
+
+for conflict becoz of any of above code when we run svn status on working dir:
+
+1) Locally delete everything under the [parent dir] folder
+2) Run 'svn cleanup [parent dir]'
+3) Locally delete the [parent dir] folder
+4) Run 'svn up' [or checkout , svn checkout http://localhost/svn/icingarepo/ /home/anjan/icinga]
+-----
+------------
+------
+
+another working dirs
+
+anjan@A3623Q1L:/etc/icinga$ svn checkout http://localhost/svn/icingarepo/ /etc/icinga
+
+anjan@A3623Q1L:/etc/icinga$ svn add *
+
+anjan@A3623Q1L:/etc/icinga$ svn commit
+
+-----------------------------------------------
+acls
+
+https://help.ubuntu.com/community/FilePermissionsACLs
+
+anjan@A3623Q1L:~/icinga/plugins$ getfacl /usr/lib/nagios/plugins/
+
+setfacl -x g:icingagroup /usr/lib/nagios/plugins/
+
+
+-----------------------------------
+
+DNS setup in ubuntu
+
+http://www.krizna.com/ubuntu/configure-dns-server-ubuntu-14-04/ [imp]
+
+https://help.ubuntu.com/14.04/serverguide/dns-configuration.html 
+
+
+https://www.digitalocean.com/community/tutorials/how-to-configure-bind-as-a-private-network-dns-server-on-ubuntu-14-04 [imp dns setup]
+
+https://help.ubuntu.com/14.04/serverguide/dns-references.html#dns-record-types [imp]
+
+http://blogging.dragon.org.uk/dns-with-bind9-and-dhcp-on-ubuntu-14-04/ [imp dns, dhcp, ntp]
+
+-----------------------------------
+
+RHEL 7: tutorial
+
+https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/7/pdf/System_Administrators_Guide/Red_Hat_Enterprise_Linux-7-System_Administrators_Guide-en-US.pdf
+
+-----------------------------------
+
+RHEL 7 iscsi
+
+http://suresh-chandra.blogspot.in/2014/10/iscsi-configuration-on-rhel-7-centos-7.html
+
+http://www.cyberciti.biz/tips/rhel-centos-fedora-linux-iscsi-howto.html
+
+http://vinizlinux.blogspot.in/ [RHEL 7 httpd setup imp]
+
+
+http://www.linux-mag.com/id/7605/ [ concept]
+
+----------------------------------
+
+making usb as bootable device:
+http://www.pendrivelinux.com/using-unetbootin-to-create-a-linux-usb-from-linux/
+
+---------------------------------
+
+fdisk
+
+http://www.thegeekstuff.com/2010/09/linux-fdisk/ [to order disk partition correctly]
+
+https://www.redhat.com/archives/redhat-list/2005-February/msg00184.html [delete one first error deletion will be done order wise from bottom]
+
+
+in fdsik:
+when choose e: create extended and p : under it do l: size : w
+
+4 primary partitions (means upto 3 and 1 for extended and in extended logical partitions).. For extented no need to give "partition type" by using :t .. "
+The primary partition that contains the logical partitions is known as an extended partition.
+
+In Linux, after creating an "extended partition", you still need to create the "logical partition". Within "fdisk" choose "n" again for each new logical partion that you create. The next question once an "extended partition" has been created is:
+Code:
+Command (m for help): n
+Command action
+   l   logical (5 or over)
+   p   primary partition (1-4)nfs:
+
+nfs:
+https://www.informit.com/library/content.aspx?b=red_hat_linux7&seqNum=149
+
+iscsi:
+
+http://www.tecmint.com/create-luns-using-lvm-in-iscsi-target/ [imp creating lun using lvm]
+
+http://www.tecmint.com/create-centralized-secure-storage-using-iscsi-targetin-linux/ [imp installing and configuring iscsi-- target server setup]
+
+http://www.tecmint.com/iscsi-initiator-client-setup/ [imp intiator client setup]
+
+iptables:
+
+http://www.howtogeek.com/177621/the-beginners-guide-to-iptables-the-linux-firewall/ [imp]
+
+
+---------------------------------
+
+http://www.tecmint.com/install-gui-in-rhel-centos-7/ [mounting cd and getting services in rhel7]
+
+---------------------------------
+
+Ubuntu:
+
+dpkg --get-selections | grep auth
+
+sudo apt-get remove auth
+
+sudo apt-get --purge remove auth
+
+dpkg --list | grep -i 'auth'
+-----------------------------------
+vagrant virtualbox setup 
+
+anjan@A3623Q1L:~$ cd vagrant_project/
+
+http://www.olindata.com/blog/2014/07/installing-vagrant-and-virtual-box-ubuntu-1404-lts [imp to use vagrant virtualbox for chef]
+
+vagrant destroy (removing vm)
+
+vagrant up (starting vm)
+
+vagrant halt (shutdown)
+
+vagrant ssh (login)
+
+vagrant reload (reload the changes done in Vagrantfile file)
+or
+vagrant reload --provision
+
+add vagrant vm:
+
+vagrant box add my-env my-env.box 
+
+vagrant init my-env
+
+If you are completely done and do not anticipate to use them anymore, you can also remove the “base box” that was downloaded. To find the name of it, type “vagrant box list“, copy the name of the box and then type “vagrant box remove <name> virtualbox“
+
+http://cfengine.com/set-cfengine-enterprise-15-minutes/ [cfengine with vagrant]
+
+------
+Note: If you want to use more hosts in your evaluation of CFEngine, you can edit the “Vagrantfile” text-file in the directory that you have just created. Line 22 says “nodes = 1″, change the “1” to the number of hosts that you want in the setup. The restriction on the number that you can choose is the amount of memory on your computer, as each host will run on a separate VM (and the maximum supported in this evaluation version of CFEngine is 25).
+------
+
+http://zeroturnaround.com/rebellabs/pragmatic-devops-how-to-create-your-first-environment-with-chef-and-vagrant/ [vagrant file chef setup]
+
+Downloading box from URL: http://cfengine.vagrant-baseboxes.s3.amazonaws.com/centos-6.5-x86_64-cfengine_enterprise-vagrant-201501201245.box
+Extracting box...te: 5285k/s, Estimated time remaining: 0:00:01)
+Successfully added box 'centos-6.5-x86_64-cfengine_enterprise-vagrant-201501201245' with provider 'virtualbox'!
+[hub] Importing base box 'centos-6.5-x86_64-cfengine_enterprise-vagrant-201501201245'...
+[hub] Matching MAC address for NAT networking...
+[hub] Setting the name of the VM...
+[hub] Clearing any previously set forwarded ports...
+[hub] Fixed port collision for 22 => 2222. Now on port 2200.
+[hub] Clearing any previously set network interfaces...
+[hub] Preparing network interfaces based on configuration...
+[hub] Forwarding ports...
+[hub] -- 22 => 2200 (adapter 1)
+[hub] -- 80 => 9002 (adapter 1)
+[hub] Running 'pre-boot' VM customizations...
+[hub] Booting VM...
+[hub] Waiting for machine to boot. This may take a few minutes...
+[hub] Machine booted and ready!
+[hub] Setting hostname...
+[hub] Configuring and enabling network interfaces...
+[hub] Mounting shared folders...
+[hub] -- /vagrant
+[hub] Running provisioner: shell...
+[hub] Running: /tmp/vagrant-shell20150706-17106-102lv3t
+Checking for CFEngine Enterprise hub
+Installing CFEngine Enterprise hub
+[hub] Running provisioner: shell...
+[hub] Running: /tmp/vagrant-shell20150706-17106-1xe4eqe
+Bootstrapping to '192.168.33.2'R: This host assumes the role of policy server
+R: Updated local policy from policy server
+R: Started the server
+R: Started the scheduler
+2015-07-06T15:40:09+0000   notice: Bootstrap to '192.168.33.2' completed successfully!
+     [OK]
+Activating update policy
+
+Please log into the mission portal:
+
+http://localhost:9002
+username: admin
+password: admin
+
+https://docs.cfengine.com/docs/3.5/examples-tutorials-deploy-sketch.html [working on mission portal]
+
+https://docs.cfengine.com/latest/guide-installation-and-configuration-general-installation-installation-enterprise-vagrant.html [imp cfengine on vagrant]
+
+Distributed (client-server) System or in a Stand Alone system (single system) 
+
+http://cfengine.com/learn/learnhow-to-write-cfengine-policy/ [imp ]
+---------------------------------
+
+
+To avoid sudo password asking (prompting)
+
+It fails, because sudo is trying to prompt on root password and there is no pseudo-tty allocated.
+
+You've to either log-in as root or set-up the following rules in your /etc/sudoers
+(or: sudo visudo):
+
+# Members of the admin group may gain root privileges.
+%admin  ALL=(ALL) NOPASSWD:ALL
+Then make sure that your user belongs to admin group (or wheel).
+
+Ideally (safer) it would be to limit root privileges only to specific commands which can be specified as %admin ALL=(ALL) NOPASSWD:/path/to/program
+
+------------------------
+
+unable to login in sf2 bigip
+
+---------------------------
+
+lvm
+
+parted /dev/sda unit MiB print free (to know how much free space) or cfdisk /dev/sda 
+
+nfs:
+On server
+
+cat /etc/exports
+
+service nfs restart
+service rpcbind restart
+Although SELinux is permissive, try : setsebool -P nfs_export_all_rw 1 Restart rpcbind, nfs and nfslock And then exportfs -a
+
+To debug
+rpcinfo -p localhost -- on client (or) rpcbind -p 192.168.33.15
+rpcinfo -p -- server
+
+showmount -e 192.168.33.15 --from client machine 192 is server ip
+
+---------------------------
